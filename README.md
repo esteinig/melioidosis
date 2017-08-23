@@ -10,7 +10,7 @@ This summary report is the initial test run for quality control and assembly of 
 git clone https://github.com/esteinig/meliodosis
 conda env create --file meliodosis/env/meliodosis.yaml
 
-# copy B03.fastq to meliodosis/files
+# copy albacore B03.fastq to meliodosis/files
 
 cd meliodosis
 source activate meliodosis
@@ -21,17 +21,15 @@ snakemake -s nanopore-assembly.snake --cluster "qsub -l mem={cluster.mem} -l wal
 
 ## Quality Control
 
-Summary:
-
 *151k reads, 0.96 Gbp, median length 3041 bp*
 
 1. Adapters were removed from the start (35.3%) and end of reads (16.8%) with Porechop. 
 2. Cleaned reads were then passed to Filtong for filtering with the following configuration: 
-- minimum read length (1,000 bp)
-- retain best bases (90%)
-- retain maximum bases (500,000)
-- trim bases from start and end of reads that do not match k-mers from reference chromosomes (B03.fasta)
-- split reads when x consequent bases fail to match a k-mer in the reference (250)
+   - minimum read length (1,000 bp)
+   - retain best bases (90%)
+   - retain maximum bases (500,000)
+   - trim bases from start and end of reads that do not match k-mers from reference chromosomes (B03.fasta)
+   - split reads when x consequent bases fail to match a k-mer in the reference (250)
 3. Filtered reads were then mapped against B03 reference chromosomes with miniasm2 (map10k).
 4. Depth of coverage was assessed and plotted using samtools and custom scripts. 
 5. Alignment read identity was extracted with Ryan's script distributed with Filtlong, which uses a strict definition of read identity:
@@ -43,7 +41,7 @@ Summary:
 
 *38k reads, 0.5 Gbp, median length 10842 bp*
 
-Workflow:
+### Workflow:
 
 The workflow and intermediary steps (e.g. removing blank lines) were encoded in Snakemake.
 
@@ -51,7 +49,7 @@ The workflow and intermediary steps (e.g. removing blank lines) were encoded in 
  <img src="https://github.com/esteinig/meliodosis/blob/master/img/qc.png">
 </p>
 
-Programs:
+**Programs:**
 
 - nanoplot
 - porechop
@@ -59,13 +57,13 @@ Programs:
 - minimap2
 - samtools
 
-Scripts:
+**Scripts:**
 
 - read_length_identity.py
 - plot_identity_length.py
 - plot_coverage.py
 
-Configuration for QC:
+**Configuration for QC:**
 
 ```json
 {
@@ -100,6 +98,8 @@ Configuration for QC:
   }
 }
 ```
+
+### Results
 
 Read summary **before filtering**:
 
