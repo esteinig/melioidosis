@@ -4,11 +4,40 @@ Nanopore sequencing and assembly of *B. pseudomallei* reference genome B03 from 
 
 This summary report is the initial test run for quality control and assembly of B03.
 
+## Setup Workflow
+
+```
+git clone https://github.com/esteinig/meliodosis
+conda env create --file meliodosis/env/meliodosis.yaml
+
+# copy B03.fastq to meliodosis/files
+
+cd meliodosis
+source activate meliodosis
+
+snakemake -s nanopore-assembly.snake --cluster "qsub -l mem={cluster.mem} -l walltime={cluster.time} -l nodes=1:ppn={cluster.cpu} -V -S /bin/bash" --jobs 300 --cluster-config cluster.json --latency-wait 30
+
+```
+
 ## Quality Control
 
-Description:
+Summary:
+
+*151k reads, 0.96 Gbp, median length 3041 bp*
+
+Adapters were removed from the start (35.3%) and end of reads (16.8%) with Porechop. Cleaned reads were then passed to Filtong for filtering with the following configuration: minimum read length (1,000 bp), retain best bases (90%), retain maximum bases (500,000), trim bases from start and end of reads that do not match k-mers from reference chromosomes (B03.fasta) and split reads when x consequent bases fail to match a k-mer in the reference (250). Filtered reads were then mapped against B03 reference chromosomes with miniasm2 (map10k). Depth of coverage was assessed and plotted using samtools and custom scripts. Alignment read identity was extracted with Ryan's script distributed with Filtlong, which uses a strict definition of read identity:
+
+> All bases are considered and unaligned bases are assigned an identity of 0. So if a read had half of its bases align with an identity of 90% and the other half is unaligned, then the read's final identity would be 45%.
+
+Read identity and length were then plotted in joint plots. NanoPlot was used before and after filtering to assess basic read statistics and plot read quality vs. read length. The workflow and intermediary steps (removing blank lines) were encoded in Snakemake.
+
+*38k reads, 0.5 Gbp, median length 10842 bp*
 
 Workflow:
+
+<p align="center">
+ <img src="https://github.com/esteinig/meliodosis/blob/master/img/qc.png">
+</p>
 
 Programs:
 
@@ -120,14 +149,32 @@ Q15:	0	0.0%
 
 ```
 
-Read quality (Q) vs. length (bp) **before filtering** (outliers removed):
+Read quality (Q) vs. length (bp) **before filtering** (length outliers removed):
 
-Read quality (Q) vs. length (bp) **after filtering** (outliers removed):
+<p align="center">
+ <img src="https://github.com/esteinig/meliodosis/blob/master/img/B03_OutliersRemoved_LengthvsQualityScatterPlot_dot.png">
+</p>
+
+Read quality (Q) vs. length (bp) **after filtering** (length outliers removed):
+
+<p align="center">
+ <img src="https://github.com/esteinig/meliodosis/blob/master/img/B03_filtered_OutliersRemoved_LengthvsQualityScatterPlot_dot.png">
+</p>
 
 Read identity (%) vs. length (bp) **before filtering**:
 
+<p align="center">
+ <img src="https://github.com/esteinig/meliodosis/blob/master/img/B03_length_identity_before_filtering.png">
+</p>
+
 Read identity (%) vs. length (bp) **after filtering**:
 
-Mean coverage against reference chromosomes **after filtering**:
+<p align="center">
+ <img src="https://github.com/esteinig/meliodosis/blob/master/img/B03_length_identity_after_filtering.png">
+</p>
 
-Median coverage against reference chromosomes **after filtering**:
+Average coverage against reference chromosomes **after filtering**:
+
+<p align="center">
+ <img src="https://github.com/esteinig/meliodosis/blob/master/img/B03_filtered_coverage_mean.png">
+</p>
