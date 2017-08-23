@@ -1,0 +1,36 @@
+{
+
+  "__default__": {
+    "account": "esteinig",
+    "time": "01:00:00",
+    "cpu": 1,
+    "mem": "1gb"
+  },
+
+  "nanoplot": {
+    "cpu": 32,
+    "mem": "8gb"
+  },
+
+  "porechop": {
+    "cpu": 32,
+    "mem": "8gb"
+  },
+
+  "alignment_after_filtering": {
+    "cpu": 32,
+    "mem": "16gb",
+    "time": "2:00:00"
+  },
+
+  "alignment_before_filtering": {
+    "cpu": 32,
+    "mem": "16gb",
+    "time": "2:00:00"
+  },
+
+  "extract_read_length_identity": {
+    "time": "10:00:00"
+  }
+
+}

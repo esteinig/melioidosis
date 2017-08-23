@@ -1,0 +1,35 @@
+{
+  "reference": "",
+
+  "nanoplot": {
+    "cpu": 32,
+    "readtype": "1D",
+    "color": "blue",
+    "drop_outliers": true
+  },
+
+  "porechop": {
+    "cpu": 32,
+    "adapter_threshold": 90.0,
+    "check_reads": 20000,
+    "scoring_scheme": "3,-6,-5,-2"
+  },
+
+  "filtlong": {
+    "other": "",
+    "target_bases": 500000000,
+    "min_length": 1000,
+    "keep_percent": 90.0,
+    "trim": true,
+    "split": 250,
+    "assembly": "ref/B03.fasta"
+  },
+
+  "minimap2": {
+    "cpu": 32,
+    "preset": "map10k",
+    "reference": "ref/B03.fasta"
+  }
+
+
+}

@@ -1,0 +1,24 @@
+Number of reads:	38105
+Total bases:	500017486
+Median read length:	10842.0
+Mean read length:	13122.1
+Readlength N50:	15819
+
+Top 5 read lengths and their average basecall quality score:
+Length: 82811bp	Q: 12.51
+Length: 81737bp	Q: 11.75
+Length: 80480bp	Q: 11.16
+Length: 79874bp	Q: 11.56
+Length: 79319bp	Q: 12.38
+
+Top 5 average basecall quality scores and their read lengths:
+Length: 4712bp	Q: 15.0
+Length: 12325bp	Q: 14.78
+Length: 2546bp	Q: 14.72
+Length: 5104bp	Q: 14.65
+Length: 9244bp	Q: 14.65
+
+Number of reads and fraction above quality cutoffs:
+Q5:	38105	100.0%
+Q10:	38089	99.96%
+Q15:	0	0.0%

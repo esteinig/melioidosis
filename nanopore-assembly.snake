@@ -1,0 +1,225 @@
+# References could be flexible by writing function that checks for sample wildcard presence
+# in reference directory of workflow.
+
+configfile: "nanopore-assembly.json"
+
+SAMPLES, = glob_wildcards("files/{sample}.fastq")
+
+shell("chmod +x scripts/read_length_identity.py")
+
+rule all:
+    input:
+        expand("nanoplot/{sample}_OutliersRemoved_HistogramReadlength.png", sample=SAMPLES)
+        if config["nanoplot"]["drop_outliers"] else expand("nanoplot/{sample}_HistogramReadlength.png", sample=SAMPLES),
+        expand("nanoplot/{sample}_filtered_OutliersRemoved_HistogramReadlength.png", sample=SAMPLES)
+        if config["nanoplot"]["drop_outliers"] else expand("nanoplot/{sample}_filtered_HistogramReadlength.png", sample=SAMPLES),
+
+        expand("minimap/{sample}_filtered_flagstat.txt", sample=SAMPLES),
+        expand("plots/{sample}_length_identity_before_filtering.png", sample=SAMPLES),
+        expand("plots/{sample}_length_identity_after_filtering.png", sample=SAMPLES),
+        expand("plots/{sample}_filtered_coverage_mean.png", sample=SAMPLES),
+        expand("plots/{sample}_filtered_coverage_median.png", sample=SAMPLES)
+
+# Generate basic plots of Albacore base-called FASTQ before QC:
+
+rule nanoplot_before:
+    input:
+        "files/{sample}.fastq"
+    output:
+        "nanoplot/{sample}_OutliersRemoved_HistogramReadlength.png"
+        if config["nanoplot"]["drop_outliers"] else "nanoplot/{sample}_HistogramReadlength.png"
+    params:
+        color = config["nanoplot"]["color"],
+        readtype = config["nanoplot"]["readtype"],
+        drop_outliers = "--drop_outliers" if config["nanoplot"]["drop_outliers"] else ""
+    threads:
+        config["nanoplot"]["cpu"]
+    shell:
+        "NanoPlot --fastq {input} --prefix {wildcards.sample}_ --outdir nanoplot "
+        "--color {params.color} --readtype {params.readtype} {params.drop_outliers} "
+        "--threads {threads}"
+
+# Porechop throws error due to blank lines in FASTQ, remove first:
+
+rule remove_blank_lines:
+    input:
+        "files/{sample}.fastq"
+    output:
+        "fastq/{sample}.fastq"
+    shell:
+        "sed '/^$/d' {input} > {output}"
+
+# Porechop needs G++ >= 4.9.1 in Conda
+# conda install -c serge-sans-paille gcc_49
+# export CXX=g++-4.9; pip install git+https://github.com/rrwick/Porechop.git
+
+rule porechop:
+    input:
+        "fastq/{sample}.fastq"
+    output:
+        "porechop/{sample}_cleaned.fastq"
+    params:
+        adapter_threshold = config["porechop"]["adapter_threshold"],
+        check_reads = config["porechop"]["check_reads"],
+        scoring_scheme = config["porechop"]["scoring_scheme"]
+    threads:
+        config["porechop"]["cpu"]
+    shell:
+        "porechop -i {input} -o {output} --adapter_threshold {params.adapter_threshold} "
+        "--check_reads {params.check_reads} --scoring_scheme {params.scoring_scheme} --threads {threads} "
+        "> porechop/porechop.log && grep 'their start' porechop/porechop.log > porechop/report.txt && "
+        "grep 'their end' porechop/porechop.log >> porechop/report.txt && "
+        "grep 'based on middle adapters' porechop/porechop.log >> porechop/report.txt"
+
+rule alignment_before_filtering:
+    input:
+        "porechop/{sample}_cleaned.fastq"
+    output:
+        paf="minimap/{sample}_alignment_before_filtering.paf",
+        sam="minimap/{sample}_alignment_before_filtering.sam"
+    params:
+        preset = "-x " + config["minimap2"]["preset"] if config["minimap2"]["preset"] else "",
+        reference = config["minimap2"]["reference"]
+    threads:
+        config["minimap2"]["cpu"]
+    shell:
+        "minimap2 {params.preset} -t {threads} -c {params.reference} {input} > {output}"
+        "minimap2 {params.preset} -t {threads} -c {params.reference} -a {input} > {output.sam}"
+
+rule filtlong:
+    input:
+        "porechop/{sample}_cleaned.fastq"
+    output:
+        "filtlong/{sample}_filtered.fastq"
+    params:
+        bin = "bin/Filtlong/bin/filtlong",
+        other = config["filtlong"]["other"],
+        min_length = config["filtlong"]["min_length"],
+        keep_percent = config["filtlong"]["keep_percent"],
+        target_bases = "--target_bases " + str(config["filtlong"]["target_bases"])
+                       if config["filtlong"]["target_bases"] else "",
+
+        trim = "--trim" if config["filtlong"]["trim"] else "",
+        split = "--split " + str(config["filtlong"]["split"]) if config["filtlong"]["split"] else "",
+
+        assembly = "--assembly " + config["filtlong"]["assembly"] if config["filtlong"]["assembly"] else ""
+    shell:
+        "LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH && "
+        "{params.bin} --min_length {params.min_length} --keep_percent {params.keep_percent} "
+        "{params.trim} {params.split} {params.target_bases} {params.assembly} {params.other} {input} > {output}"
+
+rule alignment_after_filtering:
+    input:
+        "filtlong/{sample}_filtered.fastq"
+    output:
+        paf="minimap/{sample}_alignment_after_filtering.paf",
+        sam="minimap/{sample}_alignment_after_filtering.sam"
+    params:
+        preset = "-x " + config["minimap2"]["preset"] if config["minimap2"]["preset"] else "",
+        reference = config["minimap2"]["reference"]
+    threads:
+        config["minimap2"]["cpu"]
+    shell:
+        "minimap2 {params.preset} -t {threads} -c {params.reference} {input} > {output.paf} && "
+        "minimap2 {params.preset} -t {threads} -c {params.reference} -a {input} > {output.sam}"
+
+rule extract_read_length_identity:
+    input:
+        before = "minimap/{sample}_alignment_before_filtering.paf",
+        after = "minimap/{sample}_alignment_after_filtering.paf"
+    output:
+        before = "plots/{sample}_length_identity_before_filtering.tab",
+        after = "plots/{sample}_length_identity_after_filtering.tab",
+    shell:
+        "scripts/read_length_identity.py {input.before} > {output.before} && "
+        "scripts/read_length_identity.py {input.after} > {output.after}"
+
+rule plot_read_length_identity:
+    input:
+        "plots/{sample}_length_identity_before_filtering.tab",
+        "plots/{sample}_length_identity_after_filtering.tab"
+    output:
+        "plots/{sample}_length_identity_before_filtering.png",
+        "plots/{sample}_length_identity_after_filtering.png"
+    script:
+        "scripts/plot_identity_length.py"
+
+
+rule nanoplot_after:
+    input:
+        "filtlong/{sample}_filtered.fastq"
+    output:
+        "nanoplot/{sample}_filtered_OutliersRemoved_HistogramReadlength.png"
+        if config["nanoplot"]["drop_outliers"] else "nanoplot/{sample}_filtered_HistogramReadlength.png"
+    params:
+        color = config["nanoplot"]["color"],
+        readtype = config["nanoplot"]["readtype"],
+        drop_outliers = "--drop_outliers" if config["nanoplot"]["drop_outliers"] else ""
+    threads:
+        config["nanoplot"]["cpu"]
+    shell:
+        "NanoPlot --fastq {input} --prefix {wildcards.sample}_filtered_ --outdir nanoplot "
+        "--color {params.color} --readtype {params.readtype} {params.drop_outliers} "
+        "--threads {threads}"
+
+
+
+# SAM operations for depth of coverage and basic alignment statistics:
+
+rule convert_to_bam:
+    input:
+        "minimap/{sample}_alignment_after_filtering.sam"
+    output:
+        "minimap/{sample}_alignment_after_filtering.bam"
+    shell:
+        "LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH && "
+        "samtools view -b -S -o {output} {input}"
+
+rule sort:
+    input:
+        "minimap/{sample}_alignment_after_filtering.bam"
+    output:
+        "minimap/{sample}_alignment_after_filtering_sorted.bam"
+    shell:
+        "LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH && "
+        "samtools sort {input} -o {output}"
+
+rule index:
+    input:
+        "minimap/{sample}_alignment_after_filtering_sorted.bam"
+    output:
+        "minimap/{sample}_alignment_after_filtering_sorted.bai"
+    shell:
+        "LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH && "
+        "samtools index {input} {output}"
+
+rule get_depth:
+    input:
+        index="minimap/{sample}_alignment_after_filtering_sorted.bai",
+        sorted="minimap/{sample}_alignment_after_filtering_sorted.bam"
+    output:
+        "minimap/{sample}_filtered_coverage.txt"
+    shell:
+        "LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH && "
+        "samtools depth -a {input.sorted} > {output}"
+
+rule get_stat:
+    input:
+        index="minimap/{sample}_alignment_after_filtering_sorted.bai",
+        sorted="minimap/{sample}_alignment_after_filtering_sorted.bam"
+    output:
+        "minimap/{sample}_filtered_flagstat.txt"
+    shell:
+        "LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH && "
+        "samtools flagstat {input.sorted} > {output}"
+
+rule plot_coverage:
+    input:
+        "minimap/{sample}_filtered_coverage.txt"
+    output:
+        "plots/{sample}_filtered_coverage_mean.png",
+        "plots/{sample}_filtered_coverage_median.png"
+    params:
+        window_size=50000
+    script:
+        "scripts/plot_coverage.py"
