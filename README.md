@@ -161,31 +161,31 @@ Q15:	0	0.0%
 
 ```
 
-Read quality (Q) vs. length (bp) **before filtering** (length outliers removed):
+Read quality (Q) vs. read length (bp) **before filtering** (length outliers removed):
 
 <p align="center">
  <img src="https://github.com/esteinig/meliodosis/blob/master/img/B03_OutliersRemoved_LengthvsQualityScatterPlot_dot.png">
 </p>
 
-Read quality (Q) vs. length (bp) **after filtering** (length outliers removed):
+Read quality (Q) vs. read length (bp) **after filtering** (length outliers removed):
 
 <p align="center">
  <img src="https://github.com/esteinig/meliodosis/blob/master/img/B03_filtered_OutliersRemoved_LengthvsQualityScatterPlot_dot.png">
 </p>
 
-Read identity (%) vs. length (bp) **before filtering**:
+Read identity (%) vs. read length (bp) **before filtering**:
 
 <p align="center">
  <img src="https://github.com/esteinig/meliodosis/blob/master/img/B03_length_identity_before_filtering.png">
 </p>
 
-Read identity (%) vs. length (bp) **after filtering**:
+Read identity (%) vs. read length (bp) **after filtering**:
 
 <p align="center">
  <img src="https://github.com/esteinig/meliodosis/blob/master/img/B03_length_identity_after_filtering.png">
 </p>
 
-Average coverage against reference chromosomes **after filtering**:
+Average coverage (50kbp sliding window) against reference chromosomes **after filtering**:
 
 <p align="center">
  <img src="https://github.com/esteinig/meliodosis/blob/master/img/B03_filtered_coverage_mean.png">
