@@ -25,15 +25,27 @@ Summary:
 
 *151k reads, 0.96 Gbp, median length 3041 bp*
 
-Adapters were removed from the start (35.3%) and end of reads (16.8%) with Porechop. Cleaned reads were then passed to Filtong for filtering with the following configuration: minimum read length (1,000 bp), retain best bases (90%), retain maximum bases (500,000), trim bases from start and end of reads that do not match k-mers from reference chromosomes (B03.fasta) and split reads when x consequent bases fail to match a k-mer in the reference (250). Filtered reads were then mapped against B03 reference chromosomes with miniasm2 (map10k). Depth of coverage was assessed and plotted using samtools and custom scripts. Alignment read identity was extracted with Ryan's script distributed with Filtlong, which uses a strict definition of read identity:
+1. Adapters were removed from the start (35.3%) and end of reads (16.8%) with Porechop. 
+2. Cleaned reads were then passed to Filtong for filtering with the following configuration: 
+- minimum read length (1,000 bp)
+- retain best bases (90%)
+- retain maximum bases (500,000)
+- trim bases from start and end of reads that do not match k-mers from reference chromosomes (B03.fasta)
+- split reads when x consequent bases fail to match a k-mer in the reference (250)
+3. Filtered reads were then mapped against B03 reference chromosomes with miniasm2 (map10k).
+4. Depth of coverage was assessed and plotted using samtools and custom scripts. 
+5. Alignment read identity was extracted with Ryan's script distributed with Filtlong, which uses a strict definition of read identity:
 
 > All bases are considered and unaligned bases are assigned an identity of 0. So if a read had half of its bases align with an identity of 90% and the other half is unaligned, then the read's final identity would be 45%.
 
-Read identity and length were then plotted in joint plots. NanoPlot was used before and after filtering to assess basic read statistics and plot read quality vs. read length. The workflow and intermediary steps (removing blank lines) were encoded in Snakemake.
+6. Read identity and length were then plotted in joint plots. 
+7. NanoPlot was used before and after filtering to assess basic read statistics and plot read quality vs. read length. 
 
 *38k reads, 0.5 Gbp, median length 10842 bp*
 
 Workflow:
+
+The workflow and intermediary steps (e.g. removing blank lines) were encoded in Snakemake.
 
 <p align="center">
  <img src="https://github.com/esteinig/meliodosis/blob/master/img/qc.png">
