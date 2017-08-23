@@ -1,5 +1,31 @@
 #!/usr/bin/env python
 
+"""
+
+Copyright 2017 Ryan Wick (rrwick@gmail.com)
+https://github.com/rrwick/Filtlong
+
+This script was used to get read length/identity stats from a minimap2 PAF alignment file. I used
+it to make the scatterplot/histogram figures in the Filtlong README. It uses a particularly strict
+definition of read identity: all bases are considered and unaligned bases are assigned an identity
+of 0. So if a read had half of its bases align with an identity of 90% and the other half is
+unaligned, then the read's final identity would be 45%.
+
+Example commands:
+  filtlong {OPTIONS} input.fastq.gz | gzip > filtered.fastq.gz
+  minimap2 -x map10k -t 16 -c reference.fasta filtered.fastq.gz > alignments.paf
+  read_length_identity.py alignments.paf > read_stats.tsv
+
+This file is part of Filtlong. Filtlong is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by the Free Software Foundation,
+either version 3 of the License, or (at your option) any later version. Filtlong is distributed in
+the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details. You should have received a copy of the GNU General Public License along with Filtlong. If
+not, see <http://www.gnu.org/licenses/>.
+
+"""
+
 import sys
 import collections
 import statistics
