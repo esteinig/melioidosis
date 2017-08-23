@@ -173,13 +173,13 @@ Read quality (Q) vs. read length (bp) **after filtering** (length outliers remov
  <img src="https://github.com/esteinig/meliodosis/blob/master/img/B03_filtered_OutliersRemoved_LengthvsQualityScatterPlot_dot.png">
 </p>
 
-Read identity (%) vs. read length (bp) **before filtering**:
+Read alignment identity (%) vs. read length (bp) **before filtering**:
 
 <p align="center">
  <img src="https://github.com/esteinig/meliodosis/blob/master/img/B03_length_identity_before_filtering.png">
 </p>
 
-Read identity (%) vs. read length (bp) **after filtering**:
+Read alignment identity (%) vs. read length (bp) **after filtering**:
 
 <p align="center">
  <img src="https://github.com/esteinig/meliodosis/blob/master/img/B03_length_identity_after_filtering.png">
