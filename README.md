@@ -1,4 +1,4 @@
-# Meliodosis
+# Meliodoisis
 
 Nanopore sequencing and assembly of *B. pseudomallei* reference genome B03 from Balimo, Western Province, PNG.
 
@@ -7,13 +7,13 @@ This summary report is the initial test run for quality control and assembly of 
 ## Setup Workflow
 
 ```
-git clone https://github.com/esteinig/meliodosis
-conda env create --file meliodosis/env/meliodosis.yaml
+git clone https://github.com/esteinig/melioidosis
+conda env create --file melioidosis/env/melioidosis.yaml
 
-# copy albacore B03.fastq to meliodosis/files
+# copy albacore B03.fastq to melioidosis/files
 
-cd meliodosis
-source activate meliodosis
+cd melioidosis
+source activate melioidosis
 
 snakemake -s nanopore-assembly.snake --cluster "qsub -l mem={cluster.mem} -l walltime={cluster.time} -l nodes=1:ppn={cluster.cpu} -V -S /bin/bash" --jobs 300 --cluster-config cluster.json --latency-wait 30
 
@@ -31,13 +31,12 @@ snakemake -s nanopore-assembly.snake --cluster "qsub -l mem={cluster.mem} -l wal
    - trim bases from start and end of reads that do not match k-mers from reference chromosomes (B03.fasta)
    - split reads when x consequent bases fail to match a k-mer in the reference (250)
 3. Filtered reads were then mapped against B03 reference chromosomes with miniasm2 (map10k).
-4. Depth of coverage was assessed and plotted using samtools and custom scripts. 
+4. Depth of coverage and basic alignment statistics were assessed and samtools. 
 5. Alignment read identity was extracted with Ryan's script distributed with Filtlong, which uses a strict definition of read identity:
 
 > All bases are considered and unaligned bases are assigned an identity of 0. So if a read had half of its bases align with an identity of 90% and the other half is unaligned, then the read's final identity would be 45%.
-
-6. Read identity and length were then plotted in joint plots. 
-7. NanoPlot was used before and after filtering to assess basic read statistics and plot read quality vs. read length. 
+ 
+6. NanoPlot was used before and after filtering to assess basic read statistics.
 
 *38k reads, 0.5 Gbp, median length 10842 bp*
 
@@ -46,7 +45,7 @@ snakemake -s nanopore-assembly.snake --cluster "qsub -l mem={cluster.mem} -l wal
 The workflow and intermediary steps (e.g. removing blank lines) were encoded in Snakemake.
 
 <p align="center">
- <img src="https://github.com/esteinig/meliodosis/blob/master/img/qc.png">
+ <img src="https://github.com/esteinig/melioidosis/blob/master/img/qc.png">
 </p>
 
 **Programs:**
@@ -164,29 +163,29 @@ Q15:	0	0.0%
 Read quality (Q) vs. read length (bp) **before filtering** (length outliers removed):
 
 <p align="center">
- <img src="https://github.com/esteinig/meliodosis/blob/master/img/B03_OutliersRemoved_LengthvsQualityScatterPlot_dot.png">
+ <img src="https://github.com/esteinig/melioidosis/blob/master/img/B03_OutliersRemoved_LengthvsQualityScatterPlot_dot.png">
 </p>
 
 Read quality (Q) vs. read length (bp) **after filtering** (length outliers removed):
 
 <p align="center">
- <img src="https://github.com/esteinig/meliodosis/blob/master/img/B03_filtered_OutliersRemoved_LengthvsQualityScatterPlot_dot.png">
+ <img src="https://github.com/esteinig/melioidosis/blob/master/img/B03_filtered_OutliersRemoved_LengthvsQualityScatterPlot_dot.png">
 </p>
 
 Read alignment identity (%) vs. read length (bp) **before filtering**:
 
 <p align="center">
- <img src="https://github.com/esteinig/meliodosis/blob/master/img/B03_length_identity_before_filtering.png">
+ <img src="https://github.com/esteinig/melioidosis/blob/master/img/B03_length_identity_before_filtering.png">
 </p>
 
 Read alignment identity (%) vs. read length (bp) **after filtering**:
 
 <p align="center">
- <img src="https://github.com/esteinig/meliodosis/blob/master/img/B03_length_identity_after_filtering.png">
+ <img src="https://github.com/esteinig/melioidosis/blob/master/img/B03_length_identity_after_filtering.png">
 </p>
 
 Average coverage (50kbp sliding window) against reference chromosomes **after filtering**:
 
 <p align="center">
- <img src="https://github.com/esteinig/meliodosis/blob/master/img/B03_filtered_coverage_mean.png">
+ <img src="https://github.com/esteinig/melioidosis/blob/master/img/B03_filtered_coverage_mean.png">
 </p>
