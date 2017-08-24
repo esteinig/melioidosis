@@ -1,4 +1,4 @@
-# Meliodoisis
+# Melioidosis
 
 Nanopore sequencing and assembly of *B. pseudomallei* reference genome B03 from Balimo, Western Province, PNG.
 
