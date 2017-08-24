@@ -1,3 +1,6 @@
+# Some shell commands need LD_LIBRARY_PATH set for the shell session - this is local to the rule
+# only and should not affect execution of other programs. It is strange that some programs
+# installed with conda do not search for libraries in path/to/env/lib - not sure what's going on.
 # References could be flexible by writing function that checks for sample wildcard presence
 # in reference directory of workflow.
 
@@ -6,6 +9,8 @@ configfile: "nanopore-assembly.json"
 SAMPLES, = glob_wildcards("files/{sample}.fastq")
 
 shell("chmod +x scripts/read_length_identity.py")
+shell("chmod +x scripts/plot_coverage.py")
+shell("chmod +x scripts/plot_length_identity.py")
 
 rule all:
     input:
@@ -142,8 +147,7 @@ rule plot_read_length_identity:
         "plots/{sample}_length_identity_before_filtering.png",
         "plots/{sample}_length_identity_after_filtering.png"
     script:
-        "scripts/plot_identity_length.py"
-
+        "scripts/plot_length_identity.py"
 
 rule nanoplot_after:
     input:
@@ -161,8 +165,6 @@ rule nanoplot_after:
         "NanoPlot --fastq {input} --prefix {wildcards.sample}_filtered_ --outdir nanoplot "
         "--color {params.color} --readtype {params.readtype} {params.drop_outliers} "
         "--threads {threads}"
-
-
 
 # SAM operations for depth of coverage and basic alignment statistics:
 
