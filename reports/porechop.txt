@@ -1,3 +1,0 @@
- 53,396 / 151,097 reads had adapters trimmed from their start (1,425,798 bp removed)
- 25,387 / 151,097 reads had adapters trimmed from their end (346,282 bp removed)
-15 / 151,097 reads were split based on middle adapters
