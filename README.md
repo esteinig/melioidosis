@@ -189,3 +189,12 @@ Average coverage (50kbp sliding window) against reference chromosomes **after fi
 <p align="center">
  <img src="https://github.com/esteinig/melioidosis/blob/master/img/B03_filtered_coverage_mean.png">
 </p>
+
+## Assembly
+
+### Canu
+
+<p align="center">
+ <img src="https://github.com/esteinig/melioidosis/blob/master/img/canu.default.nanopore.bandage.annotated.png">
+</p>
+
