@@ -4,7 +4,24 @@ Nanopore sequencing and assembly of *B. pseudomallei* reference genome B03 from 
 
 This summary report is the initial test run for quality control and assembly of B03.
 
-## Setup Workflow
+## Packages
+
+I have added the following package builts to my conda channel:
+
+- Racon - support for Unicycler in env running Python 3
+- Unicycler
+- Filtlong
+- Porechop
+
+You can install with dependencies in environment  - the order of channels matters: `unicycler` in channel `esteinig` supercedes old version of `unicycler` in `bioconda`. `Conda-forge` needs to be used for `samtools` with correct `zlib` to run short-read or hybrid assembly in `Unicycler`:
+
+```
+conda install -c esteinig porechop
+conda install -c esteinig filtlong
+conda install -c conda-forge -c esteinig -c bioconda unicycler
+```
+
+## Setup
 
 ```
 git clone https://github.com/esteinig/melioidosis
