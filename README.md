@@ -6,14 +6,14 @@ This summary report is the initial test run for quality control and assembly of 
 
 ## Packages
 
-I have added the following package builts to my conda channel:
+I have added the following package builds to my conda channel:
 
 - Racon - support for Unicycler in env running Python 3
 - Unicycler
 - Filtlong
 - Porechop
 
-You can install with dependencies in environment  - the order of channels matters: `unicycler` in channel `esteinig` supercedes old version of `unicycler` in `bioconda`. `Conda-forge` needs to be used for `samtools` with correct `zlib` to run short-read or hybrid assembly in `Unicycler`:
+You can install with dependencies in environment  - the order of channels matters. `Conda-forge` needs to be used for correct version of `samtools` to run short-read or hybrid assembly in `Unicycler`:
 
 ```
 conda install -c esteinig porechop
