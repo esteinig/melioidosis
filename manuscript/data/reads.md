@@ -52,7 +52,15 @@ Remove adapters with Porechop using --discard-middle for later compatibility wit
 
 porechop -i B03_uncorrected.fastq -o B03_chopped.fastq --discard-middle
 
+start:    53,396 / 151,097    1,425,798 bp
+end:      25,387 / 151,097    346,282 bp
+middle:       15 / 151,097    
 
+File: B03_chopped.fastq
+
+Filter reads without using reference data:
+
+filtlong
 
 
 
